@@ -25,7 +25,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 
 export default function CreatePostScreen() {
-  const [currentStep, setCurrentStep] = useState(1); 
+  const [currentStep, setCurrentStep] = useState(1);
   const [newPost, setNewPost] = useState({
     info: "",
     user: "",
@@ -138,18 +138,20 @@ export default function CreatePostScreen() {
                     />
                   </>
                 ) : (
-                  <View style={styles.placeholderContainer}>
-                    <Ionicons name="image-outline" size={50} color="gray" />
-                    <Text
-                      style={{
-                        color: "#696969",
-                        marginTop: 10,
-                        fontFamily: "SanFransciscoSemibold",
-                      }}
-                    >
-                      Nenhuma imagem selecionada
-                    </Text>
-                  </View>
+                  <TouchableOpacity onPress={handlePickImages}>
+                    <View style={styles.placeholderContainer}>
+                      <Ionicons name="image-outline" size={50} color="gray" />
+                      <Text
+                        style={{
+                          color: "#696969",
+                          marginTop: 10,
+                          fontFamily: "SanFransciscoSemibold",
+                        }}
+                      >
+                        Nenhuma imagem selecionada
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
                 )}
                 {isLoading && (
                   <ActivityIndicator
@@ -477,5 +479,4 @@ const styles = StyleSheet.create({
   optionButtonTextActive: {
     color: "#fff",
   },
-
 });

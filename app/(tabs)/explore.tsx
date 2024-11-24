@@ -16,6 +16,7 @@ import {
   PublicationData,
   searchPublications,
 } from "@/services/publicationService";
+import { Ionicons } from "@expo/vector-icons";
 
 const ExploreScreen = () => {
   const [publications, setPublications] = useState<PublicationData[]>([]);
@@ -75,7 +76,7 @@ const ExploreScreen = () => {
           placeholder="Buscar publicações..."
           value={searchText}
           onChangeText={setSearchText}
-          onSubmitEditing={onSearch} // Busca ao pressionar Enter
+          onSubmitEditing={onSearch}
           returnKeyType="search"
         />
       </View>
@@ -83,6 +84,7 @@ const ExploreScreen = () => {
         <PublicationSkeleton />
       ) : !searchPerformed ? (
         <View style={styles.initialState}>
+          <Ionicons name="images" size={40} color="gray" />
           <Text style={styles.initialMessage}>
             Para começar, pesquise uma publicação.
           </Text>
@@ -125,9 +127,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   initialMessage: {
-    fontSize: 18,
+    fontSize: 16,
     color: "#555",
     textAlign: "center",
+    marginTop: 20,
     marginHorizontal: 20,
   },
   emptyState: {
