@@ -42,7 +42,7 @@ export default function CreatePostScreen() {
     try {
       const selectedImages = await pickImages(newPost.images);
       if (selectedImages && selectedImages.length > 0) {
-        setNewPost((prevState) => ({
+        setNewPost((prevState:any) => ({
           ...prevState,
           images: [...prevState.images, ...selectedImages].slice(0, 4),
         }));
