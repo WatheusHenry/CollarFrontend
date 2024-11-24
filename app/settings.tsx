@@ -42,10 +42,9 @@ const SettingsScreen: React.FC = () => {
         updatedData.append("email", email);
       }
 
-      // Enviar a imagem apenas se houver uma
       if (imageUri) {
         const uriParts = imageUri.split(".");
-        const fileType = uriParts[uriParts.length - 1]; // Obtemos a extensão da imagem
+        const fileType = uriParts[uriParts.length - 1]; 
 
         const file = {
           uri: imageUri,

@@ -62,7 +62,7 @@ const LoginScreen: React.FC = () => {
           source={require("../assets/images/logo.png")}
           style={styles.image}
         />
-        <Text style={styles.title}>Welcome Back</Text>
+        <Text style={styles.title}>Bem vindo</Text>
         <TextInput
           style={[styles.input, email ? styles.inputFocused : {}]}
           placeholder="Email"
@@ -73,7 +73,7 @@ const LoginScreen: React.FC = () => {
         />
         <TextInput
           style={[styles.input, password ? styles.inputFocused : {}]}
-          placeholder="Password"
+          placeholder="Senha"
           value={password}
           placeholderTextColor="#D94509"
           onChangeText={setPassword}
@@ -87,11 +87,11 @@ const LoginScreen: React.FC = () => {
           {loading ? (
             <ActivityIndicator size="small" color="#fff" />
           ) : (
-            <Text style={styles.buttonText}>Login</Text>
+            <Text style={styles.buttonText}>Entrar</Text>
           )}
         </TouchableOpacity>
         <TouchableOpacity onPress={() => router.push("/register")}>
-          <Text style={styles.link}>Don't have an account? Register</Text>
+          <Text style={styles.link}>Ainda não tem uma conta? Clique aqui!</Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>

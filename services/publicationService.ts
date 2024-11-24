@@ -9,6 +9,7 @@ export type PublicationData = {
   description: string;
   images: string[];
   status: string;
+  contactInfo: string;
   user: {
     id: number;
     name: string;
@@ -39,11 +40,23 @@ export const fetchPublications = async (controller: AbortController) => {
   }
 };
 
-export const searchPublications = async (query: string): Promise<[]> => {
-  const response = await axios.get(
-    `${API_URL}/publications/search?q=${query}`
-  );
-  return response.data;
+export const searchPublications = async (
+  searchQuery: string
+): Promise<PublicationData[]> => {
+  if (!searchQuery || typeof searchQuery !== "string") {
+    console.error("Invalid search query");
+    throw new Error("Invalid search query");
+  }
+
+  try {
+    const response = await axios.post(`${API_URL}/search`, {
+      searchQuery: searchQuery, 
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao buscar publicações:", error);
+    throw error;
+  }
 };
 
 export const pickImages = async (existingImages: string[]) => {
@@ -63,7 +76,7 @@ export const pickImages = async (existingImages: string[]) => {
     mediaTypes: ["images"],
     allowsMultipleSelection: true,
     selectionLimit: 4 - existingImages.length,
-    quality: 1,
+    quality: 0,
     aspect: [4, 3],
   });
 
@@ -124,8 +137,10 @@ export const createPost = async (newPost: NewPost, user: string) => {
 
 export const getAllLikedPublications = async (userId: number) => {
   try {
-    const response = await axios.get(`${API_URL}/like/user/${userId}/publications`);
-    return response.data; 
+    const response = await axios.get(
+      `${API_URL}/like/user/${userId}/publications`
+    );
+    return response.data;
   } catch (error) {
     console.error("Erro ao buscar publicações curtidas:", error);
     throw error;

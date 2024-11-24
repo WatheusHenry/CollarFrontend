@@ -26,7 +26,6 @@ export const fetchUserData = async (userId: number) => {
 
 export const updateUserData = async (updatedData: any) => {
   try {
-    console.log(updatedData);
     const userId = await AsyncStorage.getItem("userId");
     const response = await fetch(`${API_URL}/users/${userId}`, {
       method: "POST",

@@ -6,11 +6,13 @@ import {
   ActivityIndicator,
   StyleSheet,
   RefreshControl,
+  TouchableOpacity,
 } from "react-native";
-import { useSearchParams } from "expo-router/build/hooks";
+import { SearchParams, useNavigation } from "expo-router";
 import { getAllLikedPublications } from "@/services/likeService";
 import Publication from "@/components/Publication";
 import { PublicationData } from "@/services/publicationService";
+import { useSearchParams } from "expo-router/build/hooks";
 
 const LikedPublicationsScreen: React.FC<{ userId: number }> = ({}) => {
   const [publications, setPublications] = useState<PublicationData[]>([]);
@@ -20,6 +22,7 @@ const LikedPublicationsScreen: React.FC<{ userId: number }> = ({}) => {
   const [userId, setUserId] = useState<string>(
     searchParams.get("userId") || ""
   );
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchLikedPublications = async () => {
@@ -46,12 +49,24 @@ const LikedPublicationsScreen: React.FC<{ userId: number }> = ({}) => {
       createdAt={item.createdAt}
       location={item.location}
       likes={item.likeCount}
+      contactInfos={item.contactInfo}
     />
   );
 
+  // Função para voltar para a tela anterior
+  const handleBackPress = () => {
+    navigation.goBack();
+  };
+
   return (
     <View style={styles.container}>
+      {/* Botão de voltar */}
+      <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
+        <Text style={styles.backText}>←</Text>
+      </TouchableOpacity>
+
       <Text style={styles.header}>Publicações Curtidas</Text>
+
       {loading ? (
         <View style={styles.center}>
           <ActivityIndicator size="large" color="#007bff" />
@@ -62,7 +77,9 @@ const LikedPublicationsScreen: React.FC<{ userId: number }> = ({}) => {
         </View>
       ) : publications.length === 0 ? (
         <View style={styles.center}>
-          <Text style={styles.emptyText}>Nenhuma publicação curtida encontrada.</Text>
+          <Text style={styles.emptyText}>
+            Nenhuma publicação curtida encontrada.
+          </Text>
         </View>
       ) : (
         <FlatList
@@ -82,6 +99,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8f9fa",
   },
   header: {
+    marginTop:40,
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
@@ -89,6 +107,7 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   center: {
+    
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
@@ -106,8 +125,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   listContainer: {
+    marginTop: 10,
     paddingHorizontal: 10,
     paddingBottom: 10,
+  },
+  backButton: {
+    position: "absolute",
+    top: 30,
+    left: 15,
+    padding: 10,
+    elevation: 5,
+  },
+  backText: {
+    fontSize: 30,
+    color: "#000",
   },
 });
 

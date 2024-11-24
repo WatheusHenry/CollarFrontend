@@ -6,11 +6,12 @@ import {
 import { useFonts } from "expo-font";
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 
 import AuthProvider from "@/app/AuthContext";
 import { useAuth } from "@/hooks/useAuth";
 
+// Impede a SplashScreen de esconder automaticamente
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -30,39 +31,45 @@ export default function RootLayout() {
 
   const [isAppReady, setIsAppReady] = useState(false);
 
+  // Função para garantir que a SplashScreen seja escondida corretamente
+  const hideSplashScreen = useCallback(async () => {
+    if (isAppReady) {
+      await SplashScreen.hideAsync();
+    }
+  }, [isAppReady]);
+
   useEffect(() => {
     if (loaded && !loading) {
-      SplashScreen.hideAsync();
       setIsAppReady(true);
     }
   }, [loaded, loading]);
 
-  // Redirecionamento com base no estado de autenticação
   useEffect(() => {
     if (isAppReady) {
+      hideSplashScreen();
+
+      // Redirecionamento com base na autenticação
       if (isAuthenticated) {
         router.replace("/(tabs)/feed");
       } else {
         router.replace("/login");
       }
     }
-  }, [isAppReady, isAuthenticated, router]);
+  }, [isAppReady, isAuthenticated, router, hideSplashScreen]);
 
   if (!isAppReady || loading) {
-    return null; // Ou uma tela de splash pode ser mostrada
+    // SplashScreen permanece ativa até que o app esteja pronto
+    return null;
   }
 
   return (
     <AuthProvider>
       <ThemeProvider value={DefaultTheme}>
         <Stack>
-          {/* Definindo a tela de login como a tela inicial se o usuário não estiver autenticado */}
           <Stack.Screen
             name="login"
             options={{ headerShown: false, gestureEnabled: false }}
           />
-
-          {/* Tela principal (tabs) carregada somente após a autenticação */}
           <Stack.Screen
             name="(tabs)"
             options={{ headerShown: false, gestureEnabled: false }}

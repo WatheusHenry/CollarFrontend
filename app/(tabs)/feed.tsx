@@ -19,7 +19,6 @@ import { router } from "expo-router";
 
 const HomeScreen = () => {
   const [publications, setPublications] = useState<PublicationData[]>([]);
-  console.log(publications);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [sortOrder] = useState<"asc" | "desc">("desc");
@@ -56,27 +55,18 @@ const HomeScreen = () => {
   }, [sortOrder]);
 
   const renderPublication = ({ item }: { item: any }) => (
-    // <TouchableOpacity
-    //   onPress={() =>
-    //     router.push({
-    //       pathname: "/postDetails",
-    //       params: item,
-    //     })
-    //   }
-    //   children={
+
     <Publication
       id={item.id}
       description={item.description}
       images={item.images}
-      contactInfos={item.contactInfos}
+      contactInfos={item.contactInfo}
       status={item.status}
       user={item.user}
       createdAt={item.createdAt}
       location={item.location}
       likes={item.likeCount}
     />
-    //   }
-    // ></TouchableOpacity>
   );
 
   return (

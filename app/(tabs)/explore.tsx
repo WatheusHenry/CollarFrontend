@@ -1,121 +1,151 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   StyleSheet,
-  View,
   FlatList,
+  RefreshControl,
+  View,
   Text,
-  Image,
-  ActivityIndicator,
+  ScrollView,
+  TextInput,
 } from "react-native";
-import SearchBar from "@/components/SearchBar";
+import Header from "@/components/Header";
+import Publication from "@/components/Publication";
+import PublicationSkeleton from "@/components/skeletons/PublicationSkeleton";
 import {
   fetchPublications,
-  searchPublications,
   PublicationData,
+  searchPublications,
 } from "@/services/publicationService";
 
-export default function ExploreScreen() {
-  const [posts, setPosts] = useState<PublicationData[]>([]);
-  const [filteredPosts, setFilteredPosts] = useState<PublicationData[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+const ExploreScreen = () => {
+  const [publications, setPublications] = useState<PublicationData[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [searchPerformed, setSearchPerformed] = useState(false);
+  const [searchText, setSearchText] = useState("");
 
-  // Função para buscar publicações do backend
-  const loadPublications = async () => {
+  const loadPublications = async (query = "") => {
+    if (!query.trim()) {
+      setPublications([]);
+      return;
+    }
+    console.log(query);
+
     setLoading(true);
-    const controller = new AbortController(); // Criando o AbortController
     try {
-      const data = await fetchPublications(controller);
-      setPosts(data);
-      setFilteredPosts(data);
+      const result = await searchPublications(query);
+      setPublications(result);
+      setSearchPerformed(true);
     } catch (error) {
-      console.error("Erro ao buscar publicações:", error);
+      console.log(error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
-  useEffect(() => {
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
     loadPublications();
   }, []);
 
-  const handleSearch = async (query: string) => {
-    if (query === "") {
-      setFilteredPosts(posts);
-    } else {
-      setLoading(true);
-      try {
-        const data = await searchPublications(query);
-        setFilteredPosts(data);
-      } catch (error) {
-        console.error("Erro na busca:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
+  const onSearch = () => {
+    loadPublications(searchText);
   };
 
-  const renderPost = ({ item }: { item: PublicationData }) => (
-    <View style={styles.postContainer}>
-      <Image source={{ uri: item.images[0] }} style={styles.postImage} />
-      <View style={styles.postDetails}>
-        <Text style={styles.postTitle}>{item.description}</Text>
-        <Text style={styles.postUser}>{item.user.name}</Text>
-        <Text style={styles.postLikeCount}>{item.likeCount} curtidas</Text>
-      </View>
-    </View>
+  const renderPublication = ({ item }: { item: PublicationData }) => (
+    <Publication
+      id={item.id}
+      description={item.description}
+      images={item.images}
+      contactInfos={item.contactInfo}
+      status={item.status}
+      user={item.user}
+      createdAt={item.createdAt}
+      location={item.location}
+      likes={item.likeCount}
+    />
   );
 
   return (
     <View style={styles.container}>
-      <SearchBar onSearch={handleSearch} data={[]} />
+      <Header />
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Buscar publicações..."
+          value={searchText}
+          onChangeText={setSearchText}
+          onSubmitEditing={onSearch} // Busca ao pressionar Enter
+          returnKeyType="search"
+        />
+      </View>
       {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+        <PublicationSkeleton />
+      ) : !searchPerformed ? (
+        <View style={styles.initialState}>
+          <Text style={styles.initialMessage}>
+            Para começar, pesquise uma publicação.
+          </Text>
+        </View>
+      ) : publications.length === 0 ? (
+        <ScrollView contentContainerStyle={styles.emptyState}>
+          <Text style={styles.emptyMessage}>Começe a pesquisar</Text>
+        </ScrollView>
       ) : (
         <FlatList
-          data={filteredPosts}
+          data={publications}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={renderPost}
-          contentContainerStyle={styles.list}
+          renderItem={renderPublication}
         />
       )}
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#f8f8f8",
+  },
+  searchContainer: {
+    padding: 10,
     backgroundColor: "#fff",
   },
-  list: {
-    padding: 10,
-  },
-  postContainer: {
-    flexDirection: "row",
-    marginBottom: 20,
-    backgroundColor: "#f9f9f9",
+  searchInput: {
+    height: 40,
+    borderWidth: 1,
+    borderColor: "#ccc",
     borderRadius: 8,
-    padding: 10,
+    paddingHorizontal: 10,
+    backgroundColor: "#f8f8f8",
   },
-  postImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 8,
+  initialState: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  postDetails: {
-    marginLeft: 10,
+  initialMessage: {
+    fontSize: 18,
+    color: "#555",
+    textAlign: "center",
+    marginHorizontal: 20,
+  },
+  emptyState: {
+    flex: 1,
+    alignItems: "center",
     justifyContent: "center",
   },
-  postTitle: {
+  emptyMessage: {
+    marginTop: 15,
     fontSize: 16,
-    fontWeight: "bold",
+    color: "#888",
   },
-  postUser: {
+  refreshText: {
     fontSize: 14,
-    color: "#666",
-  },
-  postLikeCount: {
-    fontSize: 12,
-    color: "#999",
+    color: "#888",
+    marginTop: 10,
   },
 });
+
+export default ExploreScreen;
