@@ -1,26 +1,39 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, FlatList, Dimensions, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { formatDistanceToNow, parseISO } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  FlatList,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { formatDistanceToNow, parseISO } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import Publication from "@/components/Publication";
 
 type PublicationProps = {
   id: number;
   description: string;
   images: string[];
+  contactInfo: string;
   status: string;
-  createdAt: string;
+  user: any;
+  createdAt: any;
+  location: any;
+  likes: number;
 };
 
 type UserProps = {
   id: number;
   name: string;
   email: string;
-  profileImage: string;
+  profilePicture: string;
 };
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 const PersonScreen: React.FC = () => {
   const [userData, setUserData] = useState<UserProps | null>(null);
@@ -33,15 +46,19 @@ const PersonScreen: React.FC = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userResponse = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/users/${userId}`);
+        const userResponse = await fetch(
+          `${process.env.EXPO_PUBLIC_API_URL}/users/${userId}`
+        );
         const userData = await userResponse.json();
         setUserData(userData);
 
-        const publicationsResponse = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/publications/user/${userId}`);
+        const publicationsResponse = await fetch(
+          `${process.env.EXPO_PUBLIC_API_URL}/publications/user/${userId}`
+        );
         const publicationsData = await publicationsResponse.json();
         setPublications(publicationsData);
       } catch (error) {
-        console.error('Erro ao buscar dados:', error);
+        console.error("Erro ao buscar dados:", error);
       }
     };
 
@@ -50,50 +67,33 @@ const PersonScreen: React.FC = () => {
 
   const handleLike = (id: number) => {
     setLikedPublications((prevLiked) =>
-      prevLiked.includes(id) ? prevLiked.filter((item) => item !== id) : [...prevLiked, id]
+      prevLiked.includes(id)
+        ? prevLiked.filter((item) => item !== id)
+        : [...prevLiked, id]
     );
   };
 
   const handleSave = (id: number) => {
     setSavedPublications((prevSaved) =>
-      prevSaved.includes(id) ? prevSaved.filter((item) => item !== id) : [...prevSaved, id]
+      prevSaved.includes(id)
+        ? prevSaved.filter((item) => item !== id)
+        : [...prevSaved, id]
     );
   };
 
-  const renderPublication = ({ item }: { item: PublicationProps }) => {
-    const timeAgo = formatDistanceToNow(parseISO(item.createdAt), { addSuffix: false, locale: ptBR });
-    const isLiked = likedPublications.includes(item.id);
-    const isSaved = savedPublications.includes(item.id);
-
-    return (
-      <View style={styles.publicationContainer}>
-        <View style={styles.imageContainer}>
-          <FlatList
-            data={item.images}
-            renderItem={({ item }) => (
-              <Image source={{ uri: item }} style={styles.image} resizeMode="cover" />
-            )}
-            keyExtractor={(image, index) => `${item.id}-${index}`}
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={true}
-          />
-          <Text style={styles.imageCount}>{item.images.length} imagens</Text>
-        </View>
-        <View style={styles.actionsContainer}>
-          <TouchableOpacity onPress={() => handleLike(item.id)} style={styles.iconButton}>
-            <Ionicons name={isLiked ? 'heart' : 'heart-outline'} size={30} color={isLiked ? 'red' : 'black'} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleSave(item.id)} style={styles.iconButton}>
-            <Ionicons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={30} color="black" />
-          </TouchableOpacity>
-        </View>
-        <Text style={styles.likes}>1.000 likes</Text>
-        <Text style={styles.description}>{item.description}</Text>
-        <Text style={styles.timeAgo}>{timeAgo} atrás</Text>
-      </View>
-    );
-  };
+  const renderPublication = ({ item }: { item: any }) => (
+    <Publication
+      id={item.id}
+      description={item.description}
+      images={item.images}
+      contactInfos={item.contactInfo}
+      status={item.status}
+      user={item.user}
+      createdAt={item.createdAt}
+      location={item.location}
+      likes={item.likeCount}
+    />
+  );
 
   if (!userData) {
     return <Text style={styles.loading}>Carregando...</Text>;
@@ -102,22 +102,22 @@ const PersonScreen: React.FC = () => {
   return (
     <View style={styles.containerPerson}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
           <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.optionsButton} onPress={() => router.back()}>
-          <Ionicons name="ellipsis-horizontal" size={24} color="black" />
-        </TouchableOpacity>
+        
         <View style={styles.containerProfile}>
-
           <Image
-            source={{ uri: userData.profileImage || 'https://via.placeholder.com/100' }}
+            source={{
+              uri: userData.profilePicture || "https://via.placeholder.com/100",
+            }}
             style={styles.profileImage}
           />
           <View style={styles.profileTextContainer}>
-
             <Text style={styles.userName}>{userData.name}</Text>
-            <Text style={styles.userEmail}>(14) 98806-9926</Text>
             <Text style={styles.userEmail}>{userData.email}</Text>
           </View>
         </View>
@@ -139,34 +139,41 @@ const PersonScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  containerProfile: { flexDirection: "row", marginTop: 50, justifyContent: "flex-start", marginLeft: 20 }, profileTextContainer: { marginLeft: 20 }, editIcon: { marginLeft: 70 },
+  containerProfile: {
+    flexDirection: "row",
+    marginTop: 50,
+    justifyContent: "flex-start",
+    marginLeft: 20,
+  },
+  profileTextContainer: { marginLeft: 20 },
+  editIcon: { marginLeft: 70 },
   iconWrapper: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     borderBottomColor: "#696969",
     borderBottomWidth: 2,
-    width: '30%',
+    width: "30%",
     paddingBottom: 15,
     paddingHorizontal: 15,
   },
   containerPerson: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   header: {
     borderBottomWidth: 1,
     borderColor: "#f3f3f3",
-    alignItems: 'flex-start',
+    alignItems: "flex-start",
     paddingVertical: 20,
     marginTop: 20,
   },
   backButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 15,
     left: 25,
   },
   optionsButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 15,
     right: 25,
   },
@@ -178,43 +185,43 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   userEmail: {
     fontSize: 13,
     marginTop: 5,
-    color: 'gray',
+    color: "gray",
   },
   loading: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     fontSize: 18,
   },
   publicationContainer: {
     marginBottom: 20,
   },
   imageContainer: {
-    position: 'relative',
+    position: "relative",
   },
   image: {
     width: width,
     height: 320,
   },
   imageCount: {
-    position: 'absolute',
+    position: "absolute",
     top: 10,
     right: 10,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    color: '#fff',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    color: "#fff",
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 5,
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   actionsContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginVertical: 5,
     paddingHorizontal: 10,
   },
@@ -222,7 +229,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   likes: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     paddingHorizontal: 10,
   },
   description: {
@@ -231,18 +238,18 @@ const styles = StyleSheet.create({
   },
   timeAgo: {
     paddingHorizontal: 10,
-    color: '#696969',
+    color: "#696969",
   },
   publicationText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#696969',
+    fontWeight: "600",
+    color: "#696969",
     marginLeft: 10,
   },
   containerPublication: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     borderBottomColor: "#F3F3F3",
     borderBottomWidth: 1,
     padding: 15,

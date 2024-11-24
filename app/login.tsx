@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   input: {
-    height: 50,
+    height: 40,
     borderColor: "#D94509",
     borderWidth: 1,
     borderRadius: 5,

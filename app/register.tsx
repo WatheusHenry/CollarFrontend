@@ -11,6 +11,7 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { register } from "@/services/authService";
+import { Ionicons } from "@expo/vector-icons";
 
 const RegisterScreen: React.FC = () => {
   const [name, setName] = useState("");
@@ -70,50 +71,52 @@ const RegisterScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Register</Text>
+      <Text style={styles.title}>Crie sua conta</Text>
       <TouchableOpacity onPress={handleImagePick} style={styles.imagePicker}>
         {profilePicture ? (
           <Image source={{ uri: profilePicture }} style={styles.profileImage} />
         ) : (
-          <Text style={styles.imagePickerText}>Pick Profile Picture</Text>
+          <Ionicons name="images" size={24} color="#fff" />
+
         )}
       </TouchableOpacity>
+        <Text style={styles.imagePickerText}>Selecionar foto de perfil</Text>
       <TextInput
         style={styles.input}
-        placeholder="Name"
-        placeholderTextColor="#888"
+        placeholder="Nome"
+        placeholderTextColor="#D94509"
         value={name}
         onChangeText={setName}
       />
       <TextInput
         style={styles.input}
         placeholder="Email"
-        placeholderTextColor="#888"
+        placeholderTextColor="#D94509"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
       />
       <TextInput
         style={styles.input}
-        placeholder="Password"
-        placeholderTextColor="#888"
+        placeholder="Senha"
+        placeholderTextColor="#D94509"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
       <TextInput
         style={styles.input}
-        placeholder="Confirm Password"
-        placeholderTextColor="#888"
+        placeholder="Confirmar senha"
+        placeholderTextColor="#D94509"
         value={confirmPassword}
         onChangeText={setConfirmPassword}
         secureTextEntry
       />
       <TouchableOpacity style={styles.button} onPress={handleRegister}>
-        <Text style={styles.buttonText}>Register</Text>
+        <Text style={styles.buttonText}>Criar conta</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => router.push("/login")}>
-        <Text style={styles.link}>Already have an account? Login</Text>
+        <Text style={styles.link}>Já tem uma conta? Entre aqui!</Text>
       </TouchableOpacity>
     </View>
   );
@@ -124,27 +127,39 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     padding: 16,
-    backgroundColor: "#fff",
+    backgroundColor: "#FFF3E1",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 24,
+    color: "#D94509",
     textAlign: "center",
   },
   input: {
     height: 40,
-    borderColor: "#ccc",
+    borderColor: "#D94509",
     borderWidth: 1,
     borderRadius: 5,
     marginBottom: 16,
-    paddingHorizontal: 8,
+    paddingHorizontal: 16,
+    backgroundColor: "#FFF3E1",
+    color: "#D94509",
+  },
+  inputFocused: {
+    borderColor: "#FF6A2E",
+    backgroundColor: "#FFCFBB",
   },
   button: {
-    backgroundColor: "#007BFF",
+    backgroundColor: "#E9622C",
     padding: 12,
     borderRadius: 5,
     alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  buttonDisabled: {
+    backgroundColor: "#E9622C",
   },
   buttonText: {
     color: "#fff",
@@ -154,21 +169,22 @@ const styles = StyleSheet.create({
   link: {
     marginTop: 16,
     textAlign: "center",
-    color: "#007BFF",
+    color: "#FF9900",
   },
   imagePicker: {
     height: 100,
     width: 100,
     borderRadius: 50,
-    backgroundColor: "#ddd",
+    backgroundColor: "#D94509",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 16,
     alignSelf: "center",
   },
   imagePickerText: {
-    color: "#888",
+    color: "#D94509",
     textAlign: "center",
+    marginBottom: 16,
   },
   profileImage: {
     height: 100,
