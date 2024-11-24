@@ -29,7 +29,6 @@ const ExploreScreen = () => {
       setPublications([]);
       return;
     }
-    console.log(query);
 
     setLoading(true);
     try {
